@@ -1,20 +1,21 @@
+import os
 import sys
 import argparse
 
-from moviepy.editor import *
+from moviepy.editor import VideoFileClip
 
 
-def handle(file, start_time, duration):
+def handle(file, license, start_time, duration):
     file_name = file.split('/')[-1].split(".")[0]
     video = VideoFileClip(file)
 
     # image
-    video.save_frame(f"./images/{file_name}.jpg", t=start_time)
+    video.save_frame(f"./reports/{license.upper()}_{file_name}.jpg", t=start_time)
 
     # video
-    output = video.subclip(start_time - duration//2, start_time + duration//2)
+    output = video.subclip(start_time - duration/2, start_time + duration/2)
     output.write_videofile(
-        f"./videos/new_{file_name}.mp4",
+        f"./reports/{license.upper()}_{file_name}.mp4",
         temp_audiofile=f"./videos/temp_{file_name}.m4a",
         remove_temp=True,
         codec="libx264",
@@ -29,7 +30,7 @@ def handle(file, start_time, duration):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="A tool can parse videos and images for reporting traffic violation",
+    parser = argparse.ArgumentParser(description="A tool can parse videos and images to report a traffic violation.",
                                      formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("-f",
                         "--file",
@@ -37,24 +38,33 @@ if __name__ == "__main__":
                         type=str,
                         metavar="file",
                         dest="file",
-                        help=("What video file to make subclip"))
+                        help=("Which video file to create a subclip"))
 
     parser.add_argument("-s",
                         "--start",
                         nargs="?",
-                        type=int,
+                        type=float,
                         metavar="start_time",
                         dest="start_time",
-                        help=("When starting time to cut clip"))
-    
+                        help=("When to start cutting the clip"))
+
     parser.add_argument("-d",
                     "--duration",
                     nargs="?",
                     type=int,
-                    default=10,
+                    default=6,
                     metavar="duration",
                     dest="duration",
-                    help=("How long time to play"))
+                    help=("How long does it take to play"))
+
+    parser.add_argument("-l",
+                    "--license",
+                    nargs="?",
+                    type=str,
+                    default="NONE",
+                    metavar="license",
+                    dest="license",
+                    help=("Which car license to report"))
 
     args = parser.parse_args()
     if not args.file or not args.start_time:
@@ -64,4 +74,4 @@ if __name__ == "__main__":
     if not os.path.exists(args.file):
         print("Video file doesn't exist")
 
-    handle(args.file, args.start_time, args.duration)
+    handle(args.file, args.license, args.start_time, args.duration)

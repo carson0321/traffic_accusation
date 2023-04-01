@@ -3,9 +3,9 @@ version: "3.3"
 services:
   traffic-accusation:
     build:
+      context: ./
       dockerfile: ./Dockerfile
     container_name: traffic-accusation
     volumes:
       - ./:/apps:z
-    command: >
-      python main.py -f ./20230320121912_209733A.MP4 -s 10
+    tty: true
